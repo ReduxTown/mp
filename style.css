@@ -1,181 +1,41 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+// Mock executors 2026 – EthereonOriginal is the star
+const executors = [
+  { 
+    name: "EthereonOriginal", 
+    status: "UP", 
+    level: "Level 8 UNC", 
+    note: "Signature keyless – Full Byfron bypass • Ethereon exclusive", 
+    isOriginal: true 
+  },
+  { name: "Delta Executor", status: "UP", level: "Level 7+", note: "Mobile + PC • Stable" },
+  { name: "Solara", status: "UP", level: "99% UNC", note: "External beast" },
+  { name: "Xeno Executor", status: "UP", level: "High", note: "Lightweight & fast" },
+  { name: "Swift Executor", status: "UP", level: "Keyless", note: "2026 fresh" },
+  { name: "Cryptic", status: "UP", level: "New wave", note: "Anti-ban strong" },
+  { name: "Arceus X Neo", status: "UP", level: "Mobile king", note: "Android/iOS" },
+  { name: "KRNL", status: "PATCHED", level: "Legacy", note: "Needs revival" },
+  { name: "Synapse X", status: "DOWN", level: "RIP", note: "Old era ended" },
+];
+
+const executorsGrid = document.getElementById("executors-grid");
+
+// Render executors
+function renderExecutors() {
+  executorsGrid.innerHTML = "";
+  executors.forEach(ex => {
+    const card = document.createElement("div");
+    card.className = `executor-card ${ex.isOriginal ? 'original' : ''}`;
+    card.innerHTML = `
+      <div class="executor-name">${ex.name}${ex.isOriginal ? ' ★' : ''}</div>
+      <div class="status ${ex.status.toLowerCase()}">
+        ${ex.status === "UP" ? "🟢 UP & UNDETECTED" : ex.status === "DOWN" ? "🔴 DOWN" : "🟠 PATCHED"}
+      </div>
+      <div>${ex.level}</div>
+      <small>${ex.note}</small>
+    `;
+    executorsGrid.appendChild(card);
+  });
 }
 
-body {
-  background: #0a0015;
-  color: #e0e0ff;
-  font-family: 'Orbitron', sans-serif;
-  min-height: 100vh;
-  background-image: linear-gradient(to bottom, #0a0015, #1a0033);
-}
-
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.5rem;
-}
-
-.neon-header {
-  text-align: center;
-  padding: 5rem 1rem 3rem;
-  background: rgba(10, 0, 30, 0.6);
-}
-
-.glitch {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 7.5rem;
-  font-weight: 900;
-  color: #ff00ff;
-  text-shadow: 
-    0 0 10px #ff00ff,
-    0 0 30px #ff00ff,
-    0 0 60px #00ffff,
-    0 0 100px #00ffff;
-  letter-spacing: 0.15em;
-  animation: glitch 2.5s infinite;
-  position: relative;
-}
-
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.glitch::before {
-  left: 2px;
-  text-shadow: -2px 0 #00ffff;
-  clip: rect(0, 900px, 0, 0);
-  animation: glitch-anim 3s infinite linear alternate-reverse;
-}
-
-.glitch::after {
-  left: -2px;
-  text-shadow: 2px 0 #ff00ff;
-  clip: rect(0, 900px, 0, 0);
-  animation: glitch-anim2 2.8s infinite linear alternate-reverse;
-}
-
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-3px, 3px); }
-  40% { transform: translate(3px, -3px); }
-  60% { transform: translate(-2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-}
-
-@keyframes glitch-anim {
-  0% { clip: rect(30px, 9999px, 60px, 0); }
-  20% { clip: rect(80px, 9999px, 120px, 0); }
-  40% { clip: rect(10px, 9999px, 200px, 0); }
-  60% { clip: rect(50px, 9999px, 100px, 0); }
-  100% { clip: rect(20px, 9999px, 150px, 0); }
-}
-
-@keyframes glitch-anim2 {
-  0% { clip: rect(50px, 9999px, 90px, 0); }
-  20% { clip: rect(20px, 9999px, 140px, 0); }
-  40% { clip: rect(70px, 9999px, 110px, 0); }
-  60% { clip: rect(40px, 9999px, 180px, 0); }
-  100% { clip: rect(10px, 9999px, 130px, 0); }
-}
-
-.tagline {
-  font-family: 'VT323', monospace;
-  font-size: 2rem;
-  color: #00ffff;
-  margin: 1.5rem 0;
-  text-shadow: 0 0 15px #00ffff;
-}
-
-.original-badge {
-  font-size: 2.2rem;
-  margin-top: 1.5rem;
-  color: #00ff41;
-  text-shadow: 0 0 20px #00ff41, 0 0 40px #00ff41;
-  font-weight: 900;
-}
-
-.original-badge span {
-  color: #ff00ff;
-  text-shadow: 0 0 20px #ff00ff;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-h2 {
-  text-align: center;
-  font-size: 3rem;
-  color: #ff00ff;
-  margin: 3rem 0 1rem;
-  text-shadow: 0 0 20px #ff00ff;
-}
-
-.intro {
-  text-align: center;
-  font-size: 1.4rem;
-  color: #00ffff;
-  margin-bottom: 2rem;
-  font-family: 'VT323', monospace;
-}
-
-.status-section .executors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.8rem;
-}
-
-.executor-card {
-  background: rgba(30, 10, 60, 0.6);
-  border: 2px solid #00ffff;
-  border-radius: 14px;
-  padding: 1.8rem;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
-  transition: all 0.3s;
-}
-
-.executor-card:hover {
-  transform: scale(1.06);
-  box-shadow: 0 0 50px rgba(0, 255, 255, 0.7);
-}
-
-.executor-card.original {
-  border-color: #00ff41;
-  box-shadow: 0 0 40px rgba(0, 255, 65, 0.6);
-  background: rgba(10, 40, 20, 0.5);
-}
-
-.executor-name {
-  font-size: 1.9rem;
-  margin-bottom: 1rem;
-  color: #00ffff;
-}
-
-.status {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin: 0.8rem 0;
-}
-
-.status.up { color: #00ff41; text-shadow: 0 0 20px #00ff41; }
-.status.down { color: #ff0044; text-shadow: 0 0 20px #ff0044; }
-.status.patched { color: #ffaa00; text-shadow: 0 0 20px #ffaa00; }
-
-.fake-footer {
-  text-align: center;
-  padding: 4rem 1rem 2rem;
-  color: #888;
-  font-size: 1.2rem;
-}
+// Init
+renderExecutors();
