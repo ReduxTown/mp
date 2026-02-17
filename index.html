@@ -2,22 +2,26 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Mic Piano</title>
+  <title>Anthony Store</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>🎹 Mic Piano</h1>
+  <header>
+    <h1>Anthony Store</h1>
+    <div class="cart">
+      🛒 Cart: <span id="cart-count">0</span>
+    </div>
+  </header>
 
-  <div class="controls">
-    <select id="micSelect"></select>
-    <button id="startBtn">Start</button>
+  <main id="products"></main>
+
+  <div class="cart-panel">
+    <h2>Your Cart</h2>
+    <ul id="cart-items"></ul>
+    <h3>Total: $<span id="total">0</span></h3>
   </div>
 
-  <h2 id="note">--</h2>
-
-  <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
   <script src="app.js"></script>
-
 </body>
 </html>
