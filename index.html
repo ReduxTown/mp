@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ETHEREON – Elite Executor Hub 2026</title>
+  <title>ETHEREON – Roblox Username Generator 2026</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=VT323&display=swap" rel="stylesheet">
 </head>
@@ -11,22 +11,35 @@
 
   <header class="neon-header">
     <h1 class="glitch" data-text="ETHEREON">ETHEREON</h1>
-    <p class="tagline">UNDETECTED • KEYLESS • BYFRON BYPASS 2026</p>
-    <div class="original-badge">ETHEREON<span>Original</span> – Signature Keyless Executor</div>
+    <p class="tagline">ROBLOX USERNAME GENERATOR & AVAILABILITY SCANNER – 2026</p>
   </header>
 
   <main class="container">
 
-    <section class="status-section">
-      <h2>Executor Status – Live Scan 2026</h2>
-      <p class="intro">Powered by EthereonOriginal – The most stable UNC hub in the ether.</p>
-      <div class="executors-grid" id="executors-grid">
-        <!-- Filled by JS -->
+    <section class="controls">
+      <div class="settings">
+        <label>Length: <input type="number" id="length" value="8" min="3" max="20"></label>
+        <label>Quantity: <input type="number" id="quantity" value="20" min="1" max="200"></label>
+        <label>Pattern: 
+          <select id="pattern">
+            <option value="random">Random (letters + numbers)</option>
+            <option value="letters">Letters only</option>
+            <option value="underscore">With underscores</option>
+          </select>
+        </label>
       </div>
+      <button id="generate-btn">GENERATE & SCAN</button>
+      <button id="speed-btn">SPEED SCAN (50+)</button>
+      <p id="status" class="status-msg"></p>
+    </section>
+
+    <section class="results">
+      <h2>Results</h2>
+      <div id="results-grid" class="results-grid"></div>
     </section>
 
     <footer class="fake-footer">
-      <p>ETHEREON 2026 • EthereonOriginal Level 8 UNC • Gods don't need keys • Pure parody – not real exploits</p>
+      <p>ETHEREON 2026 • Real-time Roblox API checker • Use responsibly – heavy scanning may hit rate limits</p>
     </footer>
 
   </main>
