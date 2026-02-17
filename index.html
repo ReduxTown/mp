@@ -19,7 +19,7 @@
     <section class="controls">
       <div class="settings">
         <label>Length: <input type="number" id="length" value="8" min="3" max="20"></label>
-        <label>Quantity: <input type="number" id="quantity" value="20" min="1" max="200"></label>
+        <label>Quantity: <input type="number" id="quantity" value="10" min="1" max="50"></label>
         <label>Pattern: 
           <select id="pattern">
             <option value="random">Random (letters + numbers)</option>
@@ -29,8 +29,8 @@
         </label>
       </div>
       <button id="generate-btn">GENERATE & SCAN</button>
-      <button id="speed-btn">SPEED SCAN (50+)</button>
-      <p id="status" class="status-msg"></p>
+      <button id="speed-btn">SPEED SCAN (30 MAX)</button>
+      <p id="status" class="status-msg">Note: Roblox API may require birthday param or block heavy use. Use slowly / consider proxy for bulk.</p>
     </section>
 
     <section class="results">
@@ -39,7 +39,7 @@
     </section>
 
     <footer class="fake-footer">
-      <p>ETHEREON 2026 • Real-time Roblox API checker • Use responsibly – heavy scanning may hit rate limits</p>
+      <p>ETHEREON 2026 • Uses real Roblox validate API • Heavy use may trigger rate-limits or errors – scan responsibly</p>
     </footer>
 
   </main>
