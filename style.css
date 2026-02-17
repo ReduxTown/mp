@@ -1,221 +1,117 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+// Ethereon Roblox Username Generator & Checker 2026
+// Updated for current Roblox validate API quirks (adds birthday to bypass some errors)
+
+const generateBtn = document.getElementById('generate-btn');
+const speedBtn = document.getElementById('speed-btn');
+const resultsGrid = document.getElementById('results-grid');
+const statusMsg = document.getElementById('status');
+
+const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const lettersOnly = 'abcdefghijklmnopqrstuvwxyz';
+
+function randomChar(useLettersOnly = false) {
+  const set = useLettersOnly ? lettersOnly : chars;
+  return set[Math.floor(Math.random() * set.length)];
 }
 
-body {
-  background: #0a0015;
-  color: #e0e0ff;
-  font-family: 'Orbitron', sans-serif;
-  min-height: 100vh;
-  background-image: linear-gradient(to bottom, #0a0015, #1a0033);
+function generateUsername(length, pattern = 'random') {
+  let username = '';
+  for (let i = 0; i < length; i++) {
+    username += randomChar(pattern === 'letters');
+  }
+  if (pattern === 'underscore') {
+    const pos = Math.floor(Math.random() * (length - 2)) + 1;
+    username = username.slice(0, pos) + '_' + username.slice(pos);
+  }
+  return username;
 }
 
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 1.5rem;
+async function checkAvailability(username) {
+  try {
+    // Add birthday=1990-01-01 as workaround for "valid birthday required" error
+    const url = `https://auth.roblox.com/v1/usernames/validate?username=${encodeURIComponent(username)}&context=Signup&birthday=1990-01-01`;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      mode: 'cors'  // Important for cross-origin
+    });
+
+    if (!res.ok) {
+      return { status: 'error', message: `HTTP ${res.status}` };
+    }
+
+    const data = await res.json();
+
+    if (data.code === 0) return { status: 'available' };
+    if (data.code === 1) return { status: 'taken' };
+    if (data.code === 2) return { status: 'error', message: 'API requires auth/birthday – try proxy' };
+    if (data.code === 10) return { status: 'invalid' }; // Inappropriate
+    return { status: 'invalid', message: data.message || 'Invalid format' };
+  } catch (err) {
+    return { status: 'error', message: err.message };
+  }
 }
 
-.neon-header {
-  text-align: center;
-  padding: 5rem 1rem 3rem;
+async function scanUsernames(count, length, pattern) {
+  resultsGrid.innerHTML = '';
+  statusMsg.textContent = `Scanning ${count} usernames... (throttled to avoid blocks)`;
+  generateBtn.disabled = true;
+  speedBtn.disabled = true;
+
+  const usernames = [];
+  for (let i = 0; i < count; i++) {
+    usernames.push(generateUsername(length, pattern));
+  }
+
+  for (let i = 0; i < usernames.length; i++) {
+    const username = usernames[i];
+    const result = await checkAvailability(username);
+
+    const card = document.createElement('div');
+    card.className = `result-card ${result.status}`;
+
+    let statusText = '';
+    if (result.status === 'available') statusText = 'AVAILABLE!';
+    else if (result.status === 'taken') statusText = 'Taken';
+    else if (result.status === 'invalid') statusText = 'Invalid';
+    else statusText = `Error: ${result.message || 'Unknown'}`;
+
+    card.innerHTML = `
+      <div class="username">${username}</div>
+      <div class="status-text ${result.status === 'available' ? 'available' : ''}">${statusText}</div>
+      ${result.status === 'available' ? `<button class="copy-btn" data-username="${username}">COPY</button>` : ''}
+    `;
+    resultsGrid.appendChild(card);
+
+    // Throttle: 500-800ms delay between requests
+    await new Promise(r => setTimeout(r, 500 + Math.random() * 300));
+  }
+
+  statusMsg.textContent = `Scan done! Refresh page or try smaller batches if errors occur.`;
+  generateBtn.disabled = false;
+  speedBtn.disabled = false;
 }
 
-.glitch {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 7rem;
-  font-weight: 900;
-  color: #ff00ff;
-  text-shadow: 
-    0 0 10px #ff00ff,
-    0 0 30px #ff00ff,
-    0 0 60px #00ffff,
-    0 0 100px #00ffff;
-  letter-spacing: 0.12em;
-  animation: glitch 2.8s infinite, pulse 4s infinite alternate;
-  position: relative;
-}
+// Copy handler
+resultsGrid.addEventListener('click', e => {
+  if (e.target.classList.contains('copy-btn')) {
+    const username = e.target.dataset.username;
+    navigator.clipboard.writeText(username).then(() => {
+      e.target.textContent = 'COPIED!';
+      setTimeout(() => e.target.textContent = 'COPY', 1800);
+    });
+  }
+});
 
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.8;
-}
+generateBtn.addEventListener('click', () => {
+  const length = parseInt(document.getElementById('length').value) || 8;
+  const quantity = Math.min(parseInt(document.getElementById('quantity').value) || 10, 50);
+  const pattern = document.getElementById('pattern').value;
+  scanUsernames(quantity, length, pattern);
+});
 
-.glitch::before {
-  left: 3px;
-  text-shadow: -3px 0 #00ffff;
-  clip: rect(0, 900px, 0, 0);
-  animation: glitch-anim 3.2s infinite;
-}
-
-.glitch::after {
-  left: -3px;
-  text-shadow: 3px 0 #ff00ff;
-  clip: rect(0, 900px, 0, 0);
-  animation: glitch-anim2 2.9s infinite;
-}
-
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-4px, 4px); }
-  40% { transform: translate(4px, -4px); }
-  60% { transform: translate(-2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-}
-
-@keyframes glitch-anim {
-  0% { clip: rect(20px, 9999px, 80px, 0); }
-  20% { clip: rect(60px, 9999px, 140px, 0); }
-  40% { clip: rect(10px, 9999px, 190px, 0); }
-  60% { clip: rect(50px, 9999px, 110px, 0); }
-  100% { clip: rect(30px, 9999px, 160px, 0); }
-}
-
-@keyframes glitch-anim2 {
-  0% { clip: rect(40px, 9999px, 100px, 0); }
-  30% { clip: rect(10px, 9999px, 150px, 0); }
-  70% { clip: rect(70px, 9999px, 120px, 0); }
-  100% { clip: rect(25px, 9999px, 170px, 0); }
-}
-
-@keyframes pulse {
-  0% { text-shadow: 0 0 10px #ff00ff, 0 0 30px #ff00ff, 0 0 60px #00ffff; }
-  100% { text-shadow: 0 0 20px #ff00ff, 0 0 50px #ff00ff, 0 0 90px #00ffff; }
-}
-
-.tagline {
-  font-family: 'VT323', monospace;
-  font-size: 2.2rem;
-  color: #00ffff;
-  margin: 1.5rem 0;
-  text-shadow: 0 0 15px #00ffff;
-}
-
-.controls {
-  text-align: center;
-  margin: 2rem 0 3rem;
-}
-
-.settings {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.5rem;
-}
-
-.settings label {
-  color: #00ffff;
-  font-size: 1.2rem;
-}
-
-.settings input, .settings select {
-  background: rgba(20, 0, 40, 0.7);
-  border: 1px solid #ff00ff;
-  color: white;
-  padding: 0.6rem;
-  border-radius: 6px;
-  margin-left: 0.5rem;
-}
-
-#generate-btn, #speed-btn {
-  padding: 1.2rem 2.5rem;
-  margin: 0.8rem;
-  background: #ff00ff;
-  color: black;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.3rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-#generate-btn:hover, #speed-btn:hover {
-  background: #00ffff;
-  transform: scale(1.05);
-}
-
-.status-msg {
-  margin-top: 1rem;
-  font-size: 1.3rem;
-  min-height: 1.5rem;
-}
-
-.results h2 {
-  text-align: center;
-  font-size: 2.8rem;
-  color: #ff00ff;
-  margin: 2rem 0 1.5rem;
-  text-shadow: 0 0 20px #ff00ff;
-}
-
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.2rem;
-}
-
-.result-card {
-  background: rgba(30, 10, 60, 0.6);
-  border: 2px solid #444;
-  border-radius: 10px;
-  padding: 1.2rem;
-  text-align: center;
-  transition: all 0.3s;
-}
-
-.result-card.available {
-  border-color: #00ff41;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
-}
-
-.result-card.taken {
-  border-color: #ff0044;
-}
-
-.result-card.invalid {
-  border-color: #888;
-  opacity: 0.7;
-}
-
-.username {
-  font-family: 'VT323', monospace;
-  font-size: 2rem;
-  margin-bottom: 0.8rem;
-}
-
-.status-text {
-  font-weight: bold;
-  font-size: 1.3rem;
-  margin: 0.5rem 0;
-}
-
-.copy-btn {
-  padding: 0.6rem 1.2rem;
-  background: #00ffff;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-.copy-btn:hover {
-  background: #ff00ff;
-}
-
-.fake-footer {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: #888;
-  font-size: 1.1rem;
-}
+speedBtn.addEventListener('click', () => {
+  const length = parseInt(document.getElementById('length').value) || 7;
+  const pattern = document.getElementById('pattern').value;
+  scanUsernames(30, length, pattern); // Limited to 30 for speed mode
+});
