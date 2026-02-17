@@ -3,47 +3,184 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ETHEREON – Roblox Username Generator 2026</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=VT323&display=swap" rel="stylesheet">
+  <title>EthereonUs – Roblox Username Checker</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      margin: 0;
+      padding: 30px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #8a63d2; /* Ethereal purple vibe */
+      margin-bottom: 40px;
+      font-size: 2.6rem;
+      text-shadow: 0 0 10px rgba(138,99,210,0.4);
+    }
+    .input-group {
+      display: flex;
+      margin-bottom: 1.5rem;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 220px;
+      padding: 14px 16px;
+      font-size: 1.1rem;
+      border: 2px solid #30363d;
+      border-radius: 8px;
+      background: #161b22;
+      color: white;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      border-color: #8a63d2;
+      box-shadow: 0 0 0 3px rgba(138,99,210,0.3);
+    }
+    button {
+      padding: 0 28px;
+      font-size: 1.1rem;
+      background: #6f42c1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:hover {
+      background: #7c52d4;
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled {
+      background: #21262d;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 2.5rem;
+      padding: 24px;
+      border-radius: 10px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      min-height: 80px;
+      font-size: 1.25rem;
+      line-height: 1.5;
+    }
+    .available   { background: #0f3d1e; border-color: #238636; color: #aff5b4; }
+    .taken       { background: #3d0f0f; border-color: #da3633; color: #ffcccc; }
+    .invalid     { background: #2d2a0f; border-color: #bb8009; color: #ffd789; }
+    .checking    { background: #1c2d3f; border-color: #8a63d2; color: #d4bbff; }
+    .small-text  { font-size: 0.95rem; opacity: 0.7; margin-top: 12px; }
+  </style>
 </head>
 <body>
 
-  <header class="neon-header">
-    <h1 class="glitch" data-text="ETHEREON">ETHEREON</h1>
-    <p class="tagline">ROBLOX USERNAME GENERATOR & AVAILABILITY SCANNER – 2026</p>
-  </header>
+<div class="container">
+  <h1>EthereonUs</h1>
 
-  <main class="container">
+  <div class="input-group">
+    <input type="text" id="username" placeholder="Enter Roblox username to check..." autocomplete="off" spellcheck="false" maxlength="20">
+    <button id="checkBtn">Check Availability</button>
+  </div>
 
-    <section class="controls">
-      <div class="settings">
-        <label>Length: <input type="number" id="length" value="8" min="3" max="20"></label>
-        <label>Quantity: <input type="number" id="quantity" value="10" min="1" max="50"></label>
-        <label>Pattern: 
-          <select id="pattern">
-            <option value="random">Random (letters + numbers)</option>
-            <option value="letters">Letters only</option>
-            <option value="underscore">With underscores</option>
-          </select>
-        </label>
-      </div>
-      <button id="generate-btn">GENERATE & SCAN</button>
-      <button id="speed-btn">SPEED SCAN (30 MAX)</button>
-      <p id="status" class="status-msg">Note: Roblox API may require birthday param or block heavy use. Use slowly / consider proxy for bulk.</p>
-    </section>
+  <div id="result"></div>
+</div>
 
-    <section class="results">
-      <h2>Results</h2>
-      <div id="results-grid" class="results-grid"></div>
-    </section>
+<script>
+const input = document.getElementById("username");
+const btn   = document.getElementById("checkBtn");
+const result = document.getElementById("result");
 
-    <footer class="fake-footer">
-      <p>ETHEREON 2026 • Uses real Roblox validate API • Heavy use may trigger rate-limits or errors – scan responsibly</p>
-    </footer>
+const validPattern = /^[a-zA-Z0-9_]+$/;
 
-  </main>
+async function checkUsername(name) {
+  result.className = "checking";
+  result.innerHTML = "Checking availability...";
 
-  <script src="app.js"></script>
+  try {
+    // Updated 2026-friendly endpoint (v1/usernames/validate)
+    const params = new URLSearchParams({
+      "request.username": name,
+      "request.birthday": "2000-01-01", // dummy birthday to satisfy some validation rules
+      "request.context": "Signup"
+    });
+
+    const res = await fetch(`https://auth.roblox.com/v1/usernames/validate?${params}`, {
+      method: "GET",
+      credentials: "omit",
+      headers: { "Accept": "application/json" }
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (data.code === 0) {
+      result.className = "available";
+      result.innerHTML = `✅ <b>${name}</b> is available! Grab it fast!`;
+    }
+    else if (data.code === 1) {
+      result.className = "taken";
+      result.innerHTML = `❌ <b>${name}</b> is already taken.`;
+    }
+    else if (data.code === 10) {
+      result.className = "invalid";
+      result.innerHTML = `⚠️ <b>${name}</b> contains inappropriate content or is not allowed.`;
+    }
+    else {
+      result.className = "invalid";
+      result.innerHTML = `⚠️ ${data.message || "Unexpected response from Roblox"} (code: ${data.code})`;
+    }
+
+  } catch (err) {
+    result.className = "invalid";
+    result.innerHTML = `Error: Could not connect to Roblox.<br><small>${err.message}</small>`;
+  }
+}
+
+btn.addEventListener("click", () => {
+  const name = input.value.trim();
+
+  if (!name) {
+    result.className = "invalid";
+    result.textContent = "Please enter a username.";
+    return;
+  }
+
+  if (name.length < 3 || name.length > 20) {
+    result.className = "invalid";
+    result.textContent = "Roblox usernames must be 3–20 characters long.";
+    return;
+  }
+
+  if (!validPattern.test(name)) {
+    result.className = "invalid";
+    result.textContent = "Only letters, numbers, and underscore (_) are allowed.";
+    return;
+  }
+
+  checkUsername(name);
+});
+
+// Press Enter to check
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    btn.click();
+  }
+});
+</script>
+
 </body>
 </html>
