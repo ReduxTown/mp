@@ -1,0 +1,18 @@
+body {
+  background: #111;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+  margin-top: 60px;
+}
+
+select, button {
+  padding: 10px;
+  font-size: 16px;
+  margin: 10px;
+}
+
+#note {
+  font-size: 70px;
+  color: #00ffcc;
+}
